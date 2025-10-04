@@ -20,8 +20,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -43,13 +43,14 @@ public abstract class PneumaticHorizontalKineticBlock<T extends BlockEntity> ext
         )  == InteractionResult.SUCCESS;
     }
 
+    /*
     @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(@Nonnull ItemStack stack, BlockGetter world, @Nonnull List<Component> infoList, @Nonnull TooltipFlag par4) {
         appendPneumaticHoverText(
                 () -> newBlockEntity(BlockPos.ZERO, defaultBlockState()),
                 infoList);
-    }
+    }*/
 
     @Override
     public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving) {
