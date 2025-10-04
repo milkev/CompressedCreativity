@@ -2,7 +2,7 @@ package com.lgmrszd.compressedcreativity.index;
 
 import com.lgmrszd.compressedcreativity.blocks.heater.HeaterBlock;
 import com.lgmrszd.compressedcreativity.network.CCNetwork;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class CCCommonSetup {
     public static void init(FMLCommonSetupEvent event) {

@@ -254,19 +254,19 @@ public class AdvancedAirBlowerBlockEntity extends AirBlowerBlockEntity implement
     }
 
     @Override
-    public void write(CompoundTag compound, boolean clientPacket) {
+    public void write(CompoundTag compound, net.minecraft.core.HolderLookup.Provider registries, boolean clientPacket) {
         compound.put("mesh", getMesh().serializeNBT());
         compound.put("HeatExchanger", heatExchanger.serializeNBT());
         compound.put("airExchanger", airExchanger.serializeNBT());
-        super.write(compound, clientPacket);
-    }
+        super.write(compound, registries, clientPacket);
+        }
 
     @Override
-    protected void read(CompoundTag compound, boolean clientPacket) {
+    protected void read(CompoundTag compound, net.minecraft.core.HolderLookup.Provider registries, boolean clientPacket) {
         mesh = ItemStack.of(compound.getCompound("mesh"));
         heatExchanger.deserializeNBT(compound.getCompound("HeatExchanger"));
         airExchanger.deserializeNBT(compound.getCompound("airExchanger"));
-        super.read(compound, clientPacket);
+        super.read(compound, registries, clientPacket);
     }
 
     @Override

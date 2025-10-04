@@ -200,8 +200,8 @@ public class RotationalCompressorBlockEntity extends KineticBlockEntity implemen
     }
 
 
-    public void write(CompoundTag compound, boolean clientPacket) {
-        super.write(compound, clientPacket);
+    public void write(CompoundTag compound, net.minecraft.core.HolderLookup.Provider registries, boolean clientPacket) {
+        super.write(compound, registries, clientPacket);
         compound.put("AirHandler", airHandler.serializeNBT());
         if (clientPacket) {
             compound.putDouble("airGeneratedPerTick", airGeneratedPerTick);
@@ -210,8 +210,8 @@ public class RotationalCompressorBlockEntity extends KineticBlockEntity implemen
     }
 
     @Override
-    protected void read(CompoundTag compound, boolean clientPacket) {
-        super.read(compound, clientPacket);
+    protected void read(CompoundTag compound, net.minecraft.core.HolderLookup.Provider registries, boolean clientPacket) {
+        super.read(compound, registries, clientPacket);
         airHandler.deserializeNBT(compound.getCompound("AirHandler"));
         if (clientPacket) {
             airGeneratedPerTick = compound.getDouble("airGeneratedPerTick");

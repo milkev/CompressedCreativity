@@ -7,7 +7,6 @@ import com.simibubi.create.content.processing.sequenced.SequencedAssemblyItem;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.eventbus.api.IEventBus;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,6 +65,6 @@ public class CCItems {
         }
     }
 
-    public static void register(IEventBus eventBus) {
+    public static void register(net.neoforged.bus.api.IEventBus eventBus) {
     }
 }

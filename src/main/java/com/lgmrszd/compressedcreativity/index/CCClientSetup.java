@@ -6,7 +6,7 @@ import com.lgmrszd.compressedcreativity.upgrades.MechanicalVisorClientHandler;
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import me.desht.pneumaticcraft.api.PneumaticRegistry;
 import me.desht.pneumaticcraft.api.client.pneumatic_helmet.IClientArmorRegistry;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class CCClientSetup {
 

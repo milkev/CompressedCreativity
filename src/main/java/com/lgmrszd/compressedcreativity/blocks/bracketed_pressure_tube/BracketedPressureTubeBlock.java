@@ -37,14 +37,14 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 import java.util.List;
 import java.util.Optional;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class BracketedPressureTubeBlock extends RotatedPillarBlock implements
         IBE<BracketedPressureTubeBlockEntity>, IWrenchableWithBracket, SimpleWaterloggedBlock,
         SpecialBlockItemRequirement, ITubeNetworkConnector {
@@ -74,8 +74,8 @@ public class BracketedPressureTubeBlock extends RotatedPillarBlock implements
             removeBracket(world, pos, true).ifPresent(stack -> Block.popResource(world, pos, stack));
         if (state.hasBlockEntity() && (blockTypeChanged || !newState.hasBlockEntity()))
             world.removeBlockEntity(pos);
-        IMiscHelpers miscHelpers = PneumaticRegistry.getInstance().getMiscHelpers();
-        miscHelpers.forceClientShapeRecalculation(world, pos);
+        //IMiscHelpers miscHelpers = PneumaticRegistry.getInstance().getMiscHelpers();
+        //miscHelpers.forceClientShapeRecalculation(world, pos);
     }
 
     @Override
@@ -110,8 +110,8 @@ public class BracketedPressureTubeBlock extends RotatedPillarBlock implements
 
             CCMisc.setBlockAndUpdateKeepAir(world, context.getClickedPos(), newBlockState);
 //            world.getBlockState(context.getClickedPos()).updateNeighbourShapes(world, context.getClickedPos(), 3);
-            IMiscHelpers miscHelpers = PneumaticRegistry.getInstance().getMiscHelpers();
-            miscHelpers.forceClientShapeRecalculation(context.getLevel(), context.getClickedPos());
+            //IMiscHelpers miscHelpers = PneumaticRegistry.getInstance().getMiscHelpers();
+            //miscHelpers.forceClientShapeRecalculation(context.getLevel(), context.getClickedPos());
         }
         return removed;
     }
@@ -146,7 +146,7 @@ public class BracketedPressureTubeBlock extends RotatedPillarBlock implements
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
         CCModsReference.BracketedPressureTube bracketedPressureTube =
                 CCModsReference.BracketedPressureTube.getByBlock(state.getBlock());
         if (bracketedPressureTube == null) return super.getCloneItemStack(state, target, level, pos, player);

@@ -6,9 +6,7 @@ import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import net.createmod.catnip.data.Iterate;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.ConfiguredModel;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.client.model.generators.MultiPartBlockStateBuilder;
+import net.neoforged.neoforge.client.model.generators.MultiPartBlockStateBuilder;
 
 import java.util.Map;
 

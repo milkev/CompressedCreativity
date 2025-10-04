@@ -18,13 +18,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class CCMisc {
     public static void appendPneumaticHoverText(Supplier<BlockEntity> BEProvider, List<Component> infoList) {
         if (Screen.hasShiftDown()) {
@@ -43,17 +43,17 @@ public class CCMisc {
         AtomicInteger oldAir = new AtomicInteger();
         BlockEntity oldBE = world.getBlockEntity(blockPos);
         if (oldBE != null) {
-            oldBE.getCapability(PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY).ifPresent((cap) -> oldAir.set(cap.getAir()));
+            PNCCapabilities.getAirHandler(oldBE).ifPresent((cap) -> oldAir.set(cap.getAir()));
         }
         world.setBlockAndUpdate(blockPos, newState);
         BlockEntity newBE = world.getBlockEntity(blockPos);
         if (newBE != null) {
-            newBE.getCapability(PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY).ifPresent((cap) -> cap.addAir(oldAir.get() - cap.getAir()));
+            PNCCapabilities.getAirHandler(newBE).ifPresent((cap) -> cap.addAir(oldAir.get() - cap.getAir()));
         }
     }
 
     public static ResourceLocation CCRL(String path) {
-        return new ResourceLocation(CompressedCreativity.MOD_ID, path);
+        return ResourceLocation.fromNamespaceAndPath(CompressedCreativity.MOD_ID, path);
     }
 
     public static float chestplatePressureAvailable(Player player) {
