@@ -9,6 +9,10 @@ import me.desht.pneumaticcraft.api.PNCCapabilities;
 import me.desht.pneumaticcraft.api.PneumaticRegistry;
 import me.desht.pneumaticcraft.api.block.IPneumaticWrenchable;
 import me.desht.pneumaticcraft.api.misc.IMiscHelpers;
+import me.desht.pneumaticcraft.api.tileentity.IAirHandler;
+import me.desht.pneumaticcraft.api.tileentity.IAirHandlerMachine;
+import me.desht.pneumaticcraft.common.network.NetworkHandler;
+import me.desht.pneumaticcraft.common.network.PacketNotifyBlockUpdate;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -19,6 +23,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -26,7 +31,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
@@ -35,11 +39,14 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Optional;
 
 import static com.lgmrszd.compressedcreativity.index.CCMisc.appendPneumaticHoverText;
 
@@ -92,8 +99,11 @@ public class AirBlowerBlock extends Block implements IPneumaticWrenchable, IWren
         for (Direction dir : Direction.values()) {
             if (dir == facing) continue;
             BlockEntity te = context.getLevel().getBlockEntity(context.getClickedPos().relative(dir));
-            if (te != null && te.getCapability(PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY, dir.getOpposite()).isPresent()) {
-                state = state.setValue(CONNECTION_PROPERTIES[dir.get3DDataValue()], true);
+            if(te != null) {
+                Optional<IAirHandlerMachine> test = PNCCapabilities.getAirHandler(te, dir.getOpposite());
+                if(test.isPresent()) {
+                    state = state.setValue(CONNECTION_PROPERTIES[dir.get3DDataValue()], true);
+                }
             }
         }
         return state;
@@ -133,15 +143,16 @@ public class AirBlowerBlock extends Block implements IPneumaticWrenchable, IWren
     }
 
     public boolean canConnect(Direction facing, BlockEntity other_te) {
-        return other_te != null && other_te.getCapability(PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY, facing.getOpposite()).isPresent();
+        return other_te != null && PNCCapabilities.getAirHandler(other_te, facing.getOpposite()).isPresent();
     }
 
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         InteractionResult result = IWrenchable.super.onWrenched(state, context);
         if (result == InteractionResult.SUCCESS) {
-            IMiscHelpers miscHelpers = PneumaticRegistry.getInstance().getMiscHelpers();
-            miscHelpers.forceClientShapeRecalculation(context.getLevel(), context.getClickedPos());
+            if (!context.getLevel().isClientSide) {
+                NetworkHandler.sendToAllTracking(new PacketNotifyBlockUpdate(context.getClickedPos()), context.getLevel(), context.getClickedPos());
+            }
             if(!context.getLevel().isClientSide()){
                 if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof AirBlowerBlockEntity abte) {
                     abte.updateAirHandler();
@@ -189,11 +200,13 @@ public class AirBlowerBlock extends Block implements IPneumaticWrenchable, IWren
         )  == InteractionResult.SUCCESS;
     }
 
+    /*
+    i cant find the replacement for this
     @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(@Nonnull ItemStack stack, BlockGetter world, @Nonnull List<Component> infoList, @Nonnull TooltipFlag par4) {
         appendPneumaticHoverText(
                 () -> newBlockEntity(BlockPos.ZERO, defaultBlockState()),
                 infoList);
-    }
+    }*/
 }
