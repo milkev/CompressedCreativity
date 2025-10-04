@@ -30,8 +30,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 
 
 import javax.annotation.Nonnull;
@@ -44,7 +42,7 @@ public class AdvancedAirBlowerBlockEntity extends AirBlowerBlockEntity implement
     private ItemStack mesh;
     private final IHeatExchangerLogic airExchanger = PneumaticRegistry.getInstance().getHeatRegistry().makeHeatExchangerLogic();
     protected final IHeatExchangerLogic heatExchanger;
-    private final LazyOptional<IHeatExchangerLogic> heatCap;
+    private final Optional<IHeatExchangerLogic> heatCap;
     private double ambientTemp;
     private float coolingStatus = 0.0f;
 
@@ -60,7 +58,7 @@ public class AdvancedAirBlowerBlockEntity extends AirBlowerBlockEntity implement
                 CommonConfig.INDUSTRIAL_AIR_BLOWER_VOLUME.get()
         );
         heatExchanger = PneumaticRegistry.getInstance().getHeatRegistry().makeHeatExchangerLogic();
-        heatCap = LazyOptional.of(() -> heatExchanger);
+        heatCap = Optional.of(heatExchanger);
         heatExchanger.setThermalCapacity(5);
         airExchanger.addConnectedExchanger(heatExchanger);
         airExchanger.setThermalResistance(25.0);
@@ -166,14 +164,17 @@ public class AdvancedAirBlowerBlockEntity extends AirBlowerBlockEntity implement
         CompressedCreativity.LOGGER.debug("Updated Heat Exchanger! Side: " + getBlockState().getValue(AirBlowerBlock.FACING));
     }
 
+    /*
     @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+    public @Nullable <T> T getCapability(Capability<T> capability, @Nullable Direction side) {
         if (cap == PNCCapabilities.HEAT_EXCHANGER_CAPABILITY && canConnectPneumatic(side)) {
             return heatCap.cast();
         }
         return super.getCapability(cap, side);
     }
+    
+     */
 
     @Override
     public void tick() {
@@ -250,12 +251,12 @@ public class AdvancedAirBlowerBlockEntity extends AirBlowerBlockEntity implement
     @Override
     public void invalidate() {
         super.invalidate();
-        heatCap.invalidate();
+        //heatCap.invalidate();
     }
 
     @Override
     public void write(CompoundTag compound, net.minecraft.core.HolderLookup.Provider registries, boolean clientPacket) {
-        compound.put("mesh", getMesh().serializeNBT());
+        compound.put("mesh", getMesh().save(registries));
         compound.put("HeatExchanger", heatExchanger.serializeNBT());
         compound.put("airExchanger", airExchanger.serializeNBT());
         super.write(compound, registries, clientPacket);
@@ -263,7 +264,7 @@ public class AdvancedAirBlowerBlockEntity extends AirBlowerBlockEntity implement
 
     @Override
     protected void read(CompoundTag compound, net.minecraft.core.HolderLookup.Provider registries, boolean clientPacket) {
-        mesh = ItemStack.of(compound.getCompound("mesh"));
+        mesh = ItemStack.parse(registries, compound.get("mesh")).orElse(ItemStack.EMPTY);
         heatExchanger.deserializeNBT(compound.getCompound("HeatExchanger"));
         airExchanger.deserializeNBT(compound.getCompound("airExchanger"));
         super.read(compound, registries, clientPacket);

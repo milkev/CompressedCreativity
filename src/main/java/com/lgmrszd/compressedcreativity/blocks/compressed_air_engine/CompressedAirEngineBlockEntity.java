@@ -18,18 +18,18 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CompressedAirEngineBlockEntity extends GeneratingKineticBlockEntity implements IPneumaticTileEntity, IObserveTileEntity {
 
     protected final IAirHandlerMachine airHandler;
-    private final LazyOptional<IAirHandlerMachine> airHandlerCap;
+    private final Optional<IAirHandlerMachine> airHandlerCap;
 
     private float airUsage, airBuffer;
 //    private float currentSpeed;
@@ -41,7 +41,7 @@ public class CompressedAirEngineBlockEntity extends GeneratingKineticBlockEntity
                 .createAirHandler(
                         PressureTierConfig.CustomTier.COMPRESSED_AIR_ENGINE_TIER,
                         CommonConfig.COMPRESSED_AIR_ENGINE_VOLUME.get());
-        this.airHandlerCap = LazyOptional.of(() -> airHandler);
+        this.airHandlerCap = Optional.of(airHandler);
     }
 
     @Override
@@ -125,13 +125,13 @@ public class CompressedAirEngineBlockEntity extends GeneratingKineticBlockEntity
             }
         }
         sides.add(Direction.UP);
-        airHandler.setConnectedFaces(sides);
+        airHandler.setConnectableFaces(sides);
     }
 
     @Override
     public void invalidate() {
         super.invalidate();
-        airHandlerCap.invalidate();
+        //airHandlerCap.invalidate();
     }
 
     @Override
@@ -210,6 +210,7 @@ public class CompressedAirEngineBlockEntity extends GeneratingKineticBlockEntity
         }
     }
 
+    /*
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
@@ -218,6 +219,7 @@ public class CompressedAirEngineBlockEntity extends GeneratingKineticBlockEntity
         }
         return super.getCapability(cap, side);
     }
+     */
 
     public boolean canConnectPneumatic(Direction dir) {
         return dir == Direction.UP || dir == null ||

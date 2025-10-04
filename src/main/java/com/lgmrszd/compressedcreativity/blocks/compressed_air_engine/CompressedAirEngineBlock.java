@@ -136,7 +136,7 @@ public class CompressedAirEngineBlock extends PneumaticHorizontalKineticBlock<Co
     public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
         if (facing == Direction.UP) {
             BlockEntity other_te = worldIn.getBlockEntity(currentPos.relative(facing));
-            boolean has_connection = other_te != null && other_te.getCapability(PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY, facing.getOpposite()).isPresent();
+            boolean has_connection = other_te != null && PNCCapabilities.getAirHandler(other_te, facing.getOpposite()).isPresent();
             stateIn = stateIn.setValue(UP, has_connection);
         }
         if (facing.getAxis().isHorizontal() && facingState.getBlock() instanceof CompressedAirEngineBlock &&

@@ -55,7 +55,7 @@ public class BracketedPressureTubeBlockEntity extends SmartBlockEntity {
     @Override
     public void invalidate() {
         super.invalidate();
-        airHandlerCap.invalidate();
+        //airHandlerCap.invalidate();
     }
 
     private Direction getLeakDirection() {
