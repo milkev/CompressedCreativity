@@ -29,13 +29,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.swing.text.html.Option;
+import java.security.Provider;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class AirBlowerBlockEntity extends SmartBlockEntity implements IHaveHoveringInformation, IHaveGoggleInformation, IObserveTileEntity, IAirCurrentSource, IPneumaticTileEntity {
 
@@ -47,7 +48,7 @@ public class AirBlowerBlockEntity extends SmartBlockEntity implements IHaveHover
 //    protected boolean isWorking;
 
     protected final IAirHandlerMachine airHandler;
-    private final LazyOptional<IAirHandlerMachine> airHandlerCap;
+    private final Optional<IAirHandlerMachine> airHandlerCap;
 
     private float airBuffer;
     private float airUsage = 0.0f;
@@ -69,7 +70,7 @@ public class AirBlowerBlockEntity extends SmartBlockEntity implements IHaveHover
         super(type, pos, state);
         airHandler = PneumaticRegistry.getInstance().getAirHandlerMachineFactory()
                 .createAirHandler(pressureTier, volume);
-        airHandlerCap = LazyOptional.of(() -> airHandler);
+        airHandlerCap = Optional.of(airHandler);
 
         airCurrent = new AirCurrent(this);
         updateAirFlow = true;
@@ -155,7 +156,7 @@ public class AirBlowerBlockEntity extends SmartBlockEntity implements IHaveHover
                 sides.add(side);
             }
         }
-        airHandler.setConnectedFaces(sides);
+        airHandler.setConnectableFaces(sides);
         CompressedCreativity.LOGGER.debug("Updated Air Handler! Side: " + getBlockState().getValue(AirBlowerBlock.FACING));
     }
 
@@ -223,7 +224,8 @@ public class AirBlowerBlockEntity extends SmartBlockEntity implements IHaveHover
     @Override
     public void invalidate() {
         super.invalidate();
-        airHandlerCap.invalidate();
+        //doesnt seem to be a thing anymore?
+        //airHandlerCap.invalidate();
     }
 
     @Override
@@ -246,14 +248,15 @@ public class AirBlowerBlockEntity extends SmartBlockEntity implements IHaveHover
             chuteBE.updatePush(1);
     }
 
+    /*
     @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+    public <T> Optional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == PNCCapabilities.AIR_HANDLER_MACHINE_CAPABILITY && canConnectPneumatic(side)) {
-            return airHandlerCap.cast();
+            return airHandlerCap.get()..cast();
         }
         return super.getCapability(cap, side);
-    }
+    }*/
 
 
     public boolean canConnectPneumatic(Direction dir) {
@@ -262,14 +265,14 @@ public class AirBlowerBlockEntity extends SmartBlockEntity implements IHaveHover
     }
 
     @Override
-    public void write(CompoundTag compound, boolean clientPacket) {
-        super.write(compound, clientPacket);
+    public void write(CompoundTag compound, net.minecraft.core.HolderLookup.Provider registries, boolean clientPacket) {
+        super.write(compound, registries, clientPacket);
         compound.put("AirHandler", airHandler.serializeNBT());
     }
 
     @Override
-    protected void read(CompoundTag compound, boolean clientPacket) {
-        super.read(compound, clientPacket);
+    protected void read(CompoundTag compound, net.minecraft.core.HolderLookup.Provider registries, boolean clientPacket) {
+        super.read(compound, registries, clientPacket);
         airHandler.deserializeNBT(compound.getCompound("AirHandler"));
         if (clientPacket)
             airCurrent.rebuild();
